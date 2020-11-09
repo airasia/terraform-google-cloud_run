@@ -8,6 +8,11 @@ resource "google_project_service" "cloud_run_api" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "compute_api" {
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_service_account_iam_member" "sa_user_user_groups" {
   # See https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
   for_each           = var.deployer_user_groups
@@ -38,4 +43,6 @@ resource "google_project_iam_member" "deployer_service_accounts" {
   member   = "serviceAccount:${each.value}"
 }
 
-data "google_compute_default_service_account" "default_gce_sa" {}
+data "google_compute_default_service_account" "default_gce_sa" {
+  depends_on = [google_project_service.compute_api]
+}
