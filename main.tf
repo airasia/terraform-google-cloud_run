@@ -1,3 +1,5 @@
+data "google_client_config" "google_client" {}
+
 resource "google_project_service" "gcr_api" {
   service            = "containerregistry.googleapis.com"
   disable_on_destroy = false
@@ -32,6 +34,7 @@ resource "google_service_account_iam_member" "sa_user_service_accounts" {
 resource "google_project_iam_member" "deployer_user_groups" {
   # See https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
   for_each = var.deployer_user_groups
+  project  = data.google_client_config.google_client.project
   role     = "roles/run.admin"
   member   = "group:${each.value}"
 }
@@ -39,6 +42,7 @@ resource "google_project_iam_member" "deployer_user_groups" {
 resource "google_project_iam_member" "deployer_service_accounts" {
   # See https://cloud.google.com/run/docs/reference/iam/roles#additional-configuration
   for_each = var.deployer_service_accounts
+  project  = data.google_client_config.google_client.project
   role     = "roles/run.admin"
   member   = "serviceAccount:${each.value}"
 }
